@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Consonant Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .lives {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            font-size: 2.5rem;
+        }
+
+        .heart {
+            transition: all 0.3s ease;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        .heart.lost {
+            opacity: 0.2;
+            filter: grayscale(100%);
+            animation: none;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .consonant-display {
+            font-size: 120px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 40px 0;
+            min-height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .choices-section {
+            margin: 30px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice-btn {
+            padding: 20px 30px;
+            font-size: 1.3rem;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        .choice-btn.correct {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .choice-btn.wrong {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+            animation: shake 0.5s;
+        }
+
+        .choice-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .btn-next {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-next:active {
+            transform: translateY(0);
+        }
+
+        .btn-next:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            min-height: 30px;
+            font-weight: 600;
+        }
+
+        .feedback.correct {
+            color: #28a745;
+        }
+
+        .feedback.wrong {
+            color: #dc3545;
+        }
+
+        .progress {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #777;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-value.correct-stat {
+            color: #28a745;
+        }
+
+        .stat-value.wrong-stat {
+            color: #dc3545;
+        }
+
+        .game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .game-over.show {
+            display: flex;
+        }
+
+        .game-over-content {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .game-over-title {
+            font-size: 3rem;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+
+        .game-over-text {
+            font-size: 1.3rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .game-over-stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .game-over-stat {
+            font-size: 1.5rem;
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .btn-restart {
+            padding: 15px 50px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-restart:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Thai Consonant Quiz</h1>
+        
+        <div class="lives" id="livesDisplay">
+            <span class="heart" id="heart1">❤️</span>
+            <span class="heart" id="heart2">❤️</span>
+            <span class="heart" id="heart3">❤️</span>
+        </div>
+        
+        <div class="consonant-display" id="consonantDisplay">ก</div>
+        
+        <div class="choices-section" id="choicesSection">
+            <button class="choice-btn" id="choice1">gai</button>
+            <button class="choice-btn" id="choice2">khai</button>
+            <button class="choice-btn" id="choice3">khwai</button>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+        
+        <div class="buttons">
+            <button class="btn-next" id="nextBtn" disabled>Next</button>
+        </div>
+        
+        <div class="progress" id="progress">Question 1 of 44</div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">Correct</div>
+                <div class="stat-value correct-stat" id="correct">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Wrong</div>
+                <div class="stat-value wrong-stat" id="wrong">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Remaining</div>
+                <div class="stat-value" id="remaining">44</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over" id="gameOver">
+        <div class="game-over-content">
+            <div class="game-over-title">Game Over!</div>
+            <div class="game-over-text">You lost all your lives</div>
+            <div class="game-over-stats">
+                <div class="game-over-stat">✓ Correct: <span id="finalCorrect">0</span></div>
+                <div class="game-over-stat">✗ Wrong: <span id="finalWrong">0</span></div>
+                <div class="game-over-stat">📝 Questions Answered: <span id="finalTotal">0</span></div>
+            </div>
+            <button class="btn-restart" id="restartBtn">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Thai consonants with their example words
+        const consonants = [
+            { char: 'ก', word: 'gai', meaning: 'chicken', sound: 'k' },
+            { char: 'ข', word: 'khai', meaning: 'egg', sound: 'kh' },
+            { char: 'ฃ', word: 'khuad', meaning: 'bottle', sound: 'kh' },
+            { char: 'ค', word: 'khwai', meaning: 'buffalo', sound: 'kh' },
+            { char: 'ฅ', word: 'khon', meaning: 'person', sound: 'kh' },
+            { char: 'ฆ', word: 'rakhang', meaning: 'bell', sound: 'kh' },
+            { char: 'ง', word: 'ngu', meaning: 'snake', sound: 'ng' },
+            { char: 'จ', word: 'jan', meaning: 'plate', sound: 'j' },
+            { char: 'ฉ', word: 'ching', meaning: 'cymbal', sound: 'ch' },
+            { char: 'ช', word: 'chang', meaning: 'elephant', sound: 'ch' },
+            { char: 'ซ', word: 'so', meaning: 'chain', sound: 's' },
+            { char: 'ฌ', word: 'choe', meaning: 'tree', sound: 'ch' },
+            { char: 'ญ', word: 'ying', meaning: 'woman', sound: 'y' },
+            { char: 'ฎ', word: 'chada', meaning: 'headdress', sound: 'd' },
+            { char: 'ฏ', word: 'patak', meaning: 'goad', sound: 't' },
+            { char: 'ฐ', word: 'than', meaning: 'base', sound: 'th' },
+            { char: 'ฑ', word: 'montho', meaning: 'Mandodari', sound: 'th' },
+            { char: 'ฒ', word: 'phuthao', meaning: 'old person', sound: 'th' },
+            { char: 'ณ', word: 'nen', meaning: 'novice monk', sound: 'n' },
+            { char: 'ด', word: 'dek', meaning: 'child', sound: 'd' },
+            { char: 'ต', word: 'tao', meaning: 'turtle', sound: 't' },
+            { char: 'ถ', word: 'thung', meaning: 'bag', sound: 'th' },
+            { char: 'ท', word: 'thahan', meaning: 'soldier', sound: 'th' },
+            { char: 'ธ', word: 'thong', meaning: 'flag', sound: 'th' },
+            { char: 'น', word: 'nu', meaning: 'mouse', sound: 'n' },
+            { char: 'บ', word: 'baimai', meaning: 'leaf', sound: 'b' },
+            { char: 'ป', word: 'pla', meaning: 'fish', sound: 'p' },
+            { char: 'ผ', word: 'phueng', meaning: 'bee', sound: 'ph' },
+            { char: 'ฝ', word: 'fa', meaning: 'lid', sound: 'f' },
+            { char: 'พ', word: 'phan', meaning: 'tray', sound: 'ph' },
+            { char: 'ฟ', word: 'fan', meaning: 'teeth', sound: 'f' },
+            { char: 'ภ', word: 'samphao', meaning: 'junk', sound: 'ph' },
+            { char: 'ม', word: 'ma', meaning: 'horse', sound: 'm' },
+            { char: 'ย', word: 'yak', meaning: 'giant', sound: 'y' },
+            { char: 'ร', word: 'ruea', meaning: 'boat', sound: 'r' },
+            { char: 'ล', word: 'ling', meaning: 'monkey', sound: 'l' },
+            { char: 'ว', word: 'waen', meaning: 'ring', sound: 'w' },
+            { char: 'ศ', word: 'sala', meaning: 'pavilion', sound: 's' },
+            { char: 'ษ', word: 'ruesi', meaning: 'hermit', sound: 's' },
+            { char: 'ส', word: 'suea', meaning: 'tiger', sound: 's' },
+            { char: 'ห', word: 'hip', meaning: 'chest', sound: 'h' },
+            { char: 'ฬ', word: 'jula', meaning: 'kite', sound: 'l' },
+            { char: 'อ', word: 'ang', meaning: 'basin', sound: 'o' },
+            { char: 'ฮ', word: 'nokhuk', meaning: 'owl', sound: 'h' }
+        ];
+
+        let currentIndex = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let answered = false;
+        let lives = 3;
+
+        const consonantDisplay = document.getElementById('consonantDisplay');
+        const choicesSection = document.getElementById('choicesSection');
+        const choice1 = document.getElementById('choice1');
+        const choice2 = document.getElementById('choice2');
+        const choice3 = document.getElementById('choice3');
+        const nextBtn = document.getElementById('nextBtn');
+        const feedback = document.getElementById('feedback');
+        const progress = document.getElementById('progress');
+        const correctEl = document.getElementById('correct');
+        const wrongEl = document.getElementById('wrong');
+        const remainingEl = document.getElementById('remaining');
+        const heart1 = document.getElementById('heart1');
+        const heart2 = document.getElementById('heart2');
+        const heart3 = document.getElementById('heart3');
+        const gameOver = document.getElementById('gameOver');
+        const restartBtn = document.getElementById('restartBtn');
+        const finalCorrect = document.getElementById('finalCorrect');
+        const finalWrong = document.getElementById('finalWrong');
+        const finalTotal = document.getElementById('finalTotal');
+
+        const choiceButtons = [choice1, choice2, choice3];
+        const hearts = [heart1, heart2, heart3];
+
+        function getRandomWrongChoices(correctWord, count) {
+            const wrongChoices = consonants
+                .filter(c => c.word !== correctWord)
+                .map(c => c.word);
+            
+            const selected = [];
+            while (selected.length < count && wrongChoices.length > 0) {
+                const randomIndex = Math.floor(Math.random() * wrongChoices.length);
+                selected.push(wrongChoices[randomIndex]);
+                wrongChoices.splice(randomIndex, 1);
+            }
+            
+            return selected;
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function updateLivesDisplay() {
+            hearts.forEach((heart, index) => {
+                if (index >= lives) {
+                    heart.classList.add('lost');
+                } else {
+                    heart.classList.remove('lost');
+                }
+            });
+        }
+
+        function showGameOver() {
+            finalCorrect.textContent = correctCount;
+            finalWrong.textContent = wrongCount;
+            finalTotal.textContent = correctCount + wrongCount;
+            gameOver.classList.add('show');
+        }
+
+        function restartGame() {
+            lives = 3;
+            currentIndex = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            correctEl.textContent = 0;
+            wrongEl.textContent = 0;
+            gameOver.classList.remove('show');
+            updateLivesDisplay();
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            answered = false;
+            const current = consonants[currentIndex];
+            consonantDisplay.textContent = current.char;
+            
+            // Generate choices
+            const wrongChoices = getRandomWrongChoices(current.word, 2);
+            const allChoices = shuffleArray([current.word, ...wrongChoices]);
+            
+            // Display choices
+            choiceButtons.forEach((btn, index) => {
+                btn.textContent = allChoices[index];
+                btn.disabled = false;
+                btn.classList.remove('correct', 'wrong');
+                btn.onclick = () => checkAnswer(allChoices[index], btn);
+            });
+            
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+            nextBtn.disabled = true;
+            updateProgress();
+        }
+
+        function checkAnswer(selected, button) {
+            if (answered) return;
+            
+            answered = true;
+            const current = consonants[currentIndex];
+            const isCorrect = selected === current.word;
+            
+            // Disable all buttons
+            choiceButtons.forEach(btn => btn.disabled = true);
+            
+            if (isCorrect) {
+                button.classList.add('correct');
+                feedback.textContent = `✓ Correct! ${current.word} (${current.meaning})`;
+                feedback.className = 'feedback correct';
+                correctCount++;
+                correctEl.textContent = correctCount;
+            } else {
+                button.classList.add('wrong');
+                // Show correct answer
+                choiceButtons.forEach(btn => {
+                    if (btn.textContent === current.word) {
+                        btn.classList.add('correct');
+                    }
+                });
+                feedback.textContent = `✗ Wrong! Correct answer: ${current.word} (${current.meaning})`;
+                feedback.className = 'feedback wrong';
+                wrongCount++;
+                wrongEl.textContent = wrongCount;
+                
+                // Lose a life
+                lives--;
+                updateLivesDisplay();
+                
+                // Check for game over
+                if (lives === 0) {
+                    setTimeout(() => {
+                        showGameOver();
+                    }, 1500);
+                    return;
+                }
+            }
+            
+            nextBtn.disabled = false;
+            updateStats();
+        }
+
+        function nextQuestion() {
+            currentIndex = (currentIndex + 1) % consonants.length;
+            displayQuestion();
+        }
+
+        function updateProgress() {
+            progress.textContent = `Question ${currentIndex + 1} of ${consonants.length}`;
+        }
+
+        function updateStats() {
+            const total = correctCount + wrongCount;
+            remainingEl.textContent = consonants.length - total;
+        }
+
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', restartGame);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (answered && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                if (lives > 0) {
+                    nextQuestion();
+                }
+            } else if (!answered && ['1', '2', '3'].includes(e.key)) {
+                const index = parseInt(e.key) - 1;
+                choiceButtons[index].click();
+            }
+        });
+
+        // Initialize
+        displayQuestion();
+    </script>
+</body>
+</html>
