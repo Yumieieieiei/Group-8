@@ -31,6 +31,91 @@
             text-align: center;
         }
 
+        .welcome-screen {
+            display: block;
+        }
+
+        .welcome-screen.hidden {
+            display: none;
+        }
+
+        .quiz-screen {
+            display: none;
+        }
+
+        .quiz-screen.active {
+            display: block;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .nickname-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            border: 3px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            transition: border-color 0.3s;
+        }
+
+        .nickname-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-start {
+            padding: 15px 50px;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: #28a745;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-start:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .user-info {
+            font-size: 1.3rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .streak-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: #333;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
         h1 {
             font-size: 2rem;
             color: #333;
@@ -290,46 +375,86 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
         }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Thai Consonant Quiz</h1>
-        
-        <div class="lives" id="livesDisplay">
-            <span class="heart" id="heart1">❤️</span>
-            <span class="heart" id="heart2">❤️</span>
-            <span class="heart" id="heart3">❤️</span>
-        </div>
-        
-        <div class="consonant-display" id="consonantDisplay">ก</div>
-        
-        <div class="choices-section" id="choicesSection">
-            <button class="choice-btn" id="choice1">gai</button>
-            <button class="choice-btn" id="choice2">khai</button>
-            <button class="choice-btn" id="choice3">khwai</button>
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <div class="welcome-title">🇹🇭 Thai Consonant Quiz</div>
+            <div class="welcome-subtitle">Master all 44 Thai consonants!</div>
+            
+            <input 
+                type="text" 
+                class="nickname-input" 
+                id="nicknameInput" 
+                placeholder="Enter your nickname"
+                maxlength="20"
+            />
+            
+            <button class="btn-start" id="startBtn" disabled>
+                Start Quiz
+            </button>
         </div>
 
-        <div class="feedback" id="feedback"></div>
-        
-        <div class="buttons">
-            <button class="btn-next" id="nextBtn" disabled>Next</button>
-        </div>
-        
-        <div class="progress" id="progress">Question 1 of 44</div>
-        
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-label">Correct</div>
-                <div class="stat-value correct-stat" id="correct">0</div>
+        <!-- Quiz Screen -->
+        <div class="quiz-screen" id="quizScreen">
+            <div class="user-info" id="userInfo">
+                <span id="displayName">Player</span>
+                <span class="streak-badge">🔥 <span id="streakCount">0</span> starts</span>
             </div>
-            <div class="stat-item">
-                <div class="stat-label">Wrong</div>
-                <div class="stat-value wrong-stat" id="wrong">0</div>
+            
+            <h1>Thai Consonant Quiz</h1>
+            
+            <div class="lives" id="livesDisplay">
+                <span class="heart" id="heart1">❤️</span>
+                <span class="heart" id="heart2">❤️</span>
+                <span class="heart" id="heart3">❤️</span>
             </div>
-            <div class="stat-item">
-                <div class="stat-label">Remaining</div>
-                <div class="stat-value" id="remaining">44</div>
+            
+            <div class="consonant-display" id="consonantDisplay">ก</div>
+            
+            <div class="choices-section" id="choicesSection">
+                <button class="choice-btn" id="choice1">gai</button>
+                <button class="choice-btn" id="choice2">khai</button>
+                <button class="choice-btn" id="choice3">khwai</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+            
+            <div class="buttons">
+                <button class="btn-next" id="nextBtn" disabled>Next</button>
+            </div>
+            
+            <div class="progress" id="progress">Question 1 of 44</div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-label">Correct</div>
+                    <div class="stat-value correct-stat" id="correct">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Wrong</div>
+                    <div class="stat-value wrong-stat" id="wrong">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Remaining</div>
+                    <div class="stat-value" id="remaining">44</div>
+                </div>
             </div>
         </div>
     </div>
@@ -348,6 +473,11 @@
     </div>
 
     <script>
+        // Configuration - Update this URL for your backend
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8000' 
+            : 'https://your-app-name.onrender.com';
+
         // Thai consonants with their example words
         const consonants = [
             { char: 'ก', word: 'gai', meaning: 'chicken', sound: 'k' },
@@ -396,12 +526,21 @@
             { char: 'ฮ', word: 'nokhuk', meaning: 'owl', sound: 'h' }
         ];
 
+        let shuffledConsonants = [];
         let currentIndex = 0;
         let correctCount = 0;
         let wrongCount = 0;
         let answered = false;
         let lives = 3;
+        let userNickname = '';
+        let streakCount = 0;
 
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const nicknameInput = document.getElementById('nicknameInput');
+        const startBtn = document.getElementById('startBtn');
+        const displayName = document.getElementById('displayName');
+        const streakCountEl = document.getElementById('streakCount');
         const consonantDisplay = document.getElementById('consonantDisplay');
         const choicesSection = document.getElementById('choicesSection');
         const choice1 = document.getElementById('choice1');
@@ -425,6 +564,79 @@
         const choiceButtons = [choice1, choice2, choice3];
         const hearts = [heart1, heart2, heart3];
 
+        // Enable start button when nickname is entered
+        nicknameInput.addEventListener('input', (e) => {
+            const nickname = e.target.value.trim();
+            startBtn.disabled = nickname.length === 0;
+        });
+
+        // Handle Enter key in nickname input
+        nicknameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !startBtn.disabled) {
+                startBtn.click();
+            }
+        });
+
+        // Start quiz
+        startBtn.addEventListener('click', async () => {
+            const nickname = nicknameInput.value.trim();
+            if (!nickname) return;
+
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<span class="loading"></span>';
+
+            try {
+                // Call backend to increment streak
+                const response = await fetch(`${API_URL}/api/start-quiz`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nickname: nickname })
+                });
+
+                const data = await response.json();
+                
+                userNickname = nickname;
+                streakCount = data.streak_count;
+                
+                displayName.textContent = userNickname;
+                streakCountEl.textContent = streakCount;
+
+                // Shuffle consonants
+                shuffledConsonants = shuffleArray([...consonants]);
+                
+                // Show quiz screen
+                welcomeScreen.classList.add('hidden');
+                quizScreen.classList.add('active');
+                
+                displayQuestion();
+            } catch (error) {
+                console.error('Error starting quiz:', error);
+                alert('Could not connect to server. Playing in offline mode.');
+                
+                // Fallback to offline mode
+                userNickname = nickname;
+                streakCount = 1;
+                displayName.textContent = userNickname;
+                streakCountEl.textContent = streakCount;
+                
+                shuffledConsonants = shuffleArray([...consonants]);
+                welcomeScreen.classList.add('hidden');
+                quizScreen.classList.add('active');
+                displayQuestion();
+            }
+        });
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
         function getRandomWrongChoices(correctWord, count) {
             const wrongChoices = consonants
                 .filter(c => c.word !== correctWord)
@@ -438,15 +650,6 @@
             }
             
             return selected;
-        }
-
-        function shuffleArray(array) {
-            const newArray = [...array];
-            for (let i = newArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-            }
-            return newArray;
         }
 
         function updateLivesDisplay() {
@@ -474,13 +677,17 @@
             correctEl.textContent = 0;
             wrongEl.textContent = 0;
             gameOver.classList.remove('show');
+            
+            // Reshuffle consonants
+            shuffledConsonants = shuffleArray([...consonants]);
+            
             updateLivesDisplay();
             displayQuestion();
         }
 
         function displayQuestion() {
             answered = false;
-            const current = consonants[currentIndex];
+            const current = shuffledConsonants[currentIndex];
             consonantDisplay.textContent = current.char;
             
             // Generate choices
@@ -505,7 +712,7 @@
             if (answered) return;
             
             answered = true;
-            const current = consonants[currentIndex];
+            const current = shuffledConsonants[currentIndex];
             const isCorrect = selected === current.word;
             
             // Disable all buttons
@@ -548,17 +755,17 @@
         }
 
         function nextQuestion() {
-            currentIndex = (currentIndex + 1) % consonants.length;
+            currentIndex = (currentIndex + 1) % shuffledConsonants.length;
             displayQuestion();
         }
 
         function updateProgress() {
-            progress.textContent = `Question ${currentIndex + 1} of ${consonants.length}`;
+            progress.textContent = `Question ${currentIndex + 1} of ${shuffledConsonants.length}`;
         }
 
         function updateStats() {
             const total = correctCount + wrongCount;
-            remainingEl.textContent = consonants.length - total;
+            remainingEl.textContent = shuffledConsonants.length - total;
         }
 
         nextBtn.addEventListener('click', nextQuestion);
@@ -576,9 +783,6 @@
                 choiceButtons[index].click();
             }
         });
-
-        // Initialize
-        displayQuestion();
     </script>
 </body>
 </html>
